@@ -1,0 +1,22 @@
+USAGE:
+This program allows the execution and compilation of Java and other supported languages code.  
+
+<exec>
+	[--lang <Langauge Name> --command     <The code>           <Parameter ...>]  , or
+	[                       --run         <the code file name> <Parameter ...>]  , or
+	[                       --compile     <the code file name>                ]
+
+	There are two built-in language: JavaScript (Java 6.0 needed) and Java (tools.java in the JDK needed). Non-built-in
+	          language may be refered directly using class name of its ScriptEngine class. For example:
+	          '--lang net.nawaman.script.java.JavaEngine' is refering to Java language.
+
+	--run: execute the given command. The language may be specified with '--lang' or embeded with in the code. To
+	          specified the language in the code, the first line of the code must be in the format of
+	          "... @<language name>: ..." or "... @<language name>(<engine parameter>): ...".
+	          
+	Example: 
+	<exec> --lang Java      --command 'System.out.println(\"Hello World!\"));'
+	<exec> --lang Java      --command 'import java.io.*; System.out.println((new File(\".\")).getAbsolutePath());'
+	<exec> --lang JavaScipt --command '5 + 10;'
+	<exec>                  --command '/* @Java: */ return 5 + 10;'
+	

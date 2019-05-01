@@ -1,0 +1,235 @@
+SimpleScript
+Nawapunth Manusitthipol (NawaMan)
+Copyright 2008-2009
+
+
+CONTENTS
+* License
+* Documentation Location
+
+
+LICENSE
+
+SimpleScript is licensed under the GPL.
+
+My further requests is that if you use SimpleScript in your product/project please simply inform me. Especially if you
+using this in your commercial product. I encourage you to write me even a simple paragraph about how can you use it and
+how well does it work for the purpose. I would like to hear from you and may use them for promotional purposes. 
+
+
+DOCUMENTATION LOCATION
+
+The best place to look for information about the project is to looks into the JavaDoc especially for
+net.nawaman.javacompiler.JavaCompiler class. For the usages, please look at the tests in net.nawaman.javacompiler.test
+package.
+ 
+For more information:
+	Visit:   http://blog.nawaman.net/
+	Contact: me@nawaman.net
+
+
+
+
+
+Scope Parameters:
+	In JavaScript, it is done automatically as part of JSR223. In Java, the end developer must use the variable $Scope
+	to access them.
+	NOTE: Scope parameter in JSR223 cannot be marked 'constant' and an error will be thrown if there is an attempt to
+    create one.
+
+Macro/Function Parameters:
+	Both can be access directly. For Java, there is a peice of code at the beginning of the Macro/Function body to
+	create recreate the parameter as local variables. For JavaScript, it is done automatically as part of JSR223. 
+
+Frozen Variable:
+	For Java Frozen variable is one by having them as the clas field.
+	For JavaScript, there actually a way to make it automatic but, at the moment, I have no time. The way to get frozen
+	variable in JavaScript is to call $Function.getFVInfos() and investigate from there (use $Macro in case of a macro). 
+
+Recursive:
+	Since a function can be created inside any executable, the end developer can always create them and run it
+	recursively. But just in case, Macro and Function (both Java and JavaScript) have a function "$Self" to call its own.
+	
+Serializable:
+	In JavaScript, the code (as string) is saved as the compiled JSR223 cannot be serializable and executable body is,
+	then, re-created when the executable is loaded. 
+	In Java, We use double serialization technique.
+		When save,
+		1. Get the ClassData of the executable body from JavaCompiler and save them as the part of the serialization.
+		2. Separatedly, serialize the body to an array of bytes and save them as the part of the serialization.
+		When load,
+		1. Load the ClassData and added to the JavaCompiler.
+		2. Load the byte array and de-serialize the Body.
+	This way, the byte-code of the Body's class is exist before it is loaded. 
+
+CLASSPATH NOTE:
+To use JavaEngine, ensure that the class "com.sun.tools.javac.api.JavacTool" (found in <jdk-path>/tools.jar) is in
+the classpath. 
+
+
+
+
+
+
+		/* * /
+		try {
+			ObjectInputStream OIS = new ObjectInputStream(new FileInputStream("test.ss"));
+			Script S = (Script)OIS.readObject();
+			OIS.close();
+
+			Scope MainScope = S.getEngine().newScope();
+			MainScope.newVariable("Time", Long.class, System.currentTimeMillis());
+			
+			System.out.println(S.run(MainScope));
+		} catch(IOException IOE) {}
+		/* * /
+		try {
+		
+			ScriptEngine Engine = ScriptManager.Instance.getDefaultEngineOf("JavaScript");
+			Script S = Engine.newScript(
+							"\n" +
+							"println(\"Fact-JavaScript-Script: \" + Time);" +
+							"Time; ",
+							null, null, null, null);
+
+
+			Scope MainScope = S.getEngine().newScope();
+			MainScope.newVariable("Time", Long.class, System.currentTimeMillis());
+			System.out.println(S.run(MainScope));
+			
+			ObjectOutputStream OOS = new ObjectOutputStream(new FileOutputStream("test.ss"));
+			OOS.writeObject(S);
+			OOS.close();
+		} catch(IOException IOE) {
+			System.err.println(IOE);
+		}
+		/* * /
+		try {
+		
+			ScriptEngine Engine = ScriptManager.Instance.getDefaultEngineOf("Java");
+			Script S = Engine.newScript(
+							"\n" +
+							"System.out.println(\"Fact-Java-Script: \" + $Scope.getValue(\"Time\"));" +
+							"return $Scope.getValue(\"Time\");",
+							null, null, null, null);
+			
+			Scope MainScope = Engine.newScope();
+			MainScope.newVariable("Time", Long.class, System.currentTimeMillis());
+			
+			System.out.println(S.run(MainScope));
+			ObjectOutputStream OOS = new ObjectOutputStream(new FileOutputStream("test.ss"));
+			OOS.writeObject(S);
+			OOS.close();
+		} catch(IOException IOE) {}
+		/* */
+		
+		
+		/* Macro * /
+		try {
+			ObjectInputStream OIS = new ObjectInputStream(new FileInputStream("test.ss"));
+			Macro M = (Macro)OIS.readObject();
+			OIS.close();
+
+			Scope MainScope = M.getEngine().newScope();
+			MainScope.newVariable("Time", Long.class, System.currentTimeMillis());
+			System.out.println(M.run(MainScope, 5));
+			
+		} catch(IOException IOE) {
+			System.err.println(IOE);
+		}
+		/* * /
+		try {
+		
+			ScriptEngine Engine = ScriptManager.Instance.getDefaultEngineOf("JavaScript");
+			Macro M = Engine.newMacro(
+							new Signature.Simple("fact", Integer.class, false, Integer.class),
+							new String[] { "I" },
+							"\n" +
+							"println(\"Fact-JavaScript-Macro: \" + Time);" +
+							"return (I <= 1) ? 1 : I*$Self(I - 1); ",
+							null, null, null, null);
+
+
+			Scope MainScope = M.getEngine().newScope();
+			MainScope.newVariable("Time", Long.class, System.currentTimeMillis());
+			System.out.println(M.run(MainScope, 5));
+			
+			ObjectOutputStream OOS = new ObjectOutputStream(new FileOutputStream("test.ss"));
+			OOS.writeObject(M);
+			OOS.close();
+		} catch(IOException IOE) {
+			System.err.println(IOE);
+		}
+		/* * /
+		try {
+		
+			ScriptEngine Engine = ScriptManager.Instance.getDefaultEngineOf("Java");
+			Macro M = Engine.newMacro(
+							new Signature.Simple("fact", Integer.class, false, Integer.class),
+							new String[] { "I" },
+							"\n" +
+							"System.out.println(\"Fact-Java-Macro: \" + $Scope.getValue(\"Time\"));" +
+							"return (I < 1) ? 1 : I * $Self(I - 1);",
+							null, null, null, null);
+			
+			Scope MainScope = Engine.newScope();
+			MainScope.newVariable("Time", Long.class, System.currentTimeMillis());
+			
+			System.out.println(M.run(MainScope, 5));
+			ObjectOutputStream OOS = new ObjectOutputStream(new FileOutputStream("test.ss"));
+			OOS.writeObject(M);
+			OOS.close();
+		} catch(IOException IOE) {}
+		/* */
+		
+		
+		
+		/* Function * /
+		try {
+			ObjectInputStream OIS = new ObjectInputStream(new FileInputStream("test.ss"));
+			Function F = (Function)OIS.readObject();
+			OIS.close();
+			
+			System.out.println(F.run(5));
+			
+		} catch(IOException IOE) {
+			System.err.println(IOE);
+		}
+		/* * /
+		try {
+		
+			ScriptEngine Engine = ScriptManager.Instance.getDefaultEngineOf("JavaScript");
+			Function F = Engine.newFunction(
+							new Signature.Simple("fact", Integer.class, false, Integer.class),
+							new String[] { "I" },
+							"\n" +
+							"println(\"Fact-JavaScript-Function\");\n" +
+							"return (I <= 1) ? 1 : I*$Self(I - 1); ",
+							null, null, null, null);
+			
+			System.out.println(F.run(7));
+			ObjectOutputStream OOS = new ObjectOutputStream(new FileOutputStream("test.ss"));
+			OOS.writeObject(F);
+			OOS.close();
+		} catch(IOException IOE) {
+			System.err.println(IOE);
+		}
+		/* * /
+		try {
+		
+			ScriptEngine Engine = ScriptManager.Instance.getDefaultEngineOf("Java");
+			Function F = Engine.newFunction(
+							new Signature.Simple("fact", Integer.class, false, Integer.class),
+							new String[] { "I" },
+							"\n" +
+							"System.out.println(\"Fact-Java-Function\");\n" +
+							"return (I < 1) ? 1 : I*$Self(I - 1);",
+							null, null, null, null);
+			
+			System.out.println(F.run(5));
+			ObjectOutputStream OOS = new ObjectOutputStream(new FileOutputStream("test.ss"));
+			OOS.writeObject(F);
+			OOS.close();
+		} catch(IOException IOE) {}
+		/* */
+		if(10 == (5+5)) System.exit(0);
