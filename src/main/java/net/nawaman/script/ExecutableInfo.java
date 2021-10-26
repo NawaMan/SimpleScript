@@ -61,8 +61,6 @@ public class ExecutableInfo {
 		if(pParamNames.length != this.Signature.getParamCount())
 			throw new IllegalArgumentException();
 
-		if(pParamNames == null) return  true;
-		
 		this.ParamNames = pParamNames.clone();
 		return true;
 	}

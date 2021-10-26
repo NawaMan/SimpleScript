@@ -897,7 +897,7 @@ public class JavaEngine implements ScriptEngine {
 	
 	static final String LastReturnNull = "\nreturn null;";
 
-	/**{@inheritDoc}*/ @SuppressWarnings("unchecked")
+	/**{@inheritDoc}*/ @SuppressWarnings({ "unchecked", "rawtypes" })
 	Object newExecutable(EKind pEKind, Signature pSignature, String[] pParamNames, String pCode, Scope pFrozen,
 			String[] pFVNames, CompileOption pOption, ProblemContainer pResult) {
 	

@@ -29,10 +29,6 @@ public class ExecutableHolder extends UsableHolder<Executable> {
 	
 	ExecutableHolder(Usepath pUsepath, UsableStorage pStorage) {
 		super(pUsepath, pStorage.getName());
-		
-		if(pStorage == null)
-			throw new NullPointerException();
-		
 		this.Storage = pStorage;
 	}
 	
