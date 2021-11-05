@@ -1024,7 +1024,9 @@ public class JavaEngine implements ScriptEngine {
 					.append(Middle)
 					.append(Params)
 					.append(Body)
-					.append(Suffix).toString();
+					.append(Suffix)
+					.toString()
+					.replaceAll("->\\$Result", "");
 	
 			BodyEnd = TempClassCode.length() - Suffix.length();
 			
