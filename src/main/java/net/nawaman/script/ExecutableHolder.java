@@ -4,11 +4,11 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
 import net.nawaman.script.Tools.ExtractResult;
-import net.nawaman.usepath.USFile;
+import net.nawaman.usepath.UsableStorageFile;
 import net.nawaman.usepath.UsableFactory;
 import net.nawaman.usepath.UsableHolder;
 import net.nawaman.usepath.UsableStorage;
-import net.nawaman.usepath.Usepath;
+import net.nawaman.usepath.UsePath;
 
 /** Hold an executable */
 public class ExecutableHolder extends UsableHolder<Executable> {
@@ -16,19 +16,20 @@ public class ExecutableHolder extends UsableHolder<Executable> {
 	static public class UFExecutable implements UsableFactory {
 		
 		/** Returns the name of the Factory */
-		public String getName() {
+		public String name() {
 			return "ExecutableHolderFactory";
 		}
 		
 		/** Create the UsableHolder from the given paramters */
-		public UsableHolder<? extends Object> getUsableHolder(Usepath Path, UsableStorage Storage) {
+		@SuppressWarnings("unchecked")
+		public UsableHolder<Executable> getUsableHolder(UsePath Path, UsableStorage Storage) {
 			return new ExecutableHolder(Path, Storage);
 		}
 		
 	}
 	
-	ExecutableHolder(Usepath pUsepath, UsableStorage pStorage) {
-		super(pUsepath, pStorage.getName());
+	ExecutableHolder(UsePath pUsepath, UsableStorage pStorage) {
+		super(pUsepath, pStorage.name());
 		this.Storage = pStorage;
 	}
 	
@@ -48,8 +49,8 @@ public class ExecutableHolder extends UsableHolder<Executable> {
 		
 		try {
 			// Use it
-			if(this.Storage instanceof USFile) {
-				this.Exec = Tools.Use(((USFile)this.Storage).getTheFile());
+			if(this.Storage instanceof UsableStorageFile) {
+				this.Exec = Tools.Use(((UsableStorageFile)this.Storage).file());
 				return this.Exec;
 			}
 			
@@ -59,7 +60,7 @@ public class ExecutableHolder extends UsableHolder<Executable> {
 			boolean isWritable = this.Storage.isWritable();
 			
 			// Re-compiled			
-			ExtractResult EResult = Tools.ExtractExecutableFromCompiledText(this.Storage.getName(), Text, null, null, !isWritable, true, false);
+			ExtractResult EResult = Tools.ExtractExecutableFromCompiledText(this.Storage.name(), Text, null, null, !isWritable, true, false);
 			if(EResult.IsUpdated || EResult.IsAltered) {
 				if(isWritable) {
 					// Save the compile result back
@@ -71,7 +72,7 @@ public class ExecutableHolder extends UsableHolder<Executable> {
 					BAOS.close();
 					
 				} else {
-					System.err.println("The executable `"+this.getName()+"` is out-of-date or " +
+					System.err.println("The executable `"+this.objectName()+"` is out-of-date or " +
 							"improperly altered. SimpleScript can manage to recompile it but unable to write the result back.");
 				}
 			}

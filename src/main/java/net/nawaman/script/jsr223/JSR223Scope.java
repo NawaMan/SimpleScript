@@ -9,7 +9,6 @@ import javax.script.ScriptContext;
 import javax.script.SimpleScriptContext;
 
 import net.nawaman.script.Scope;
-import net.nawaman.script.ScriptManager;
 
 /** Scope used for the execution of JSR223 script */
 public class JSR223Scope  implements Scope {
@@ -71,8 +70,7 @@ public class JSR223Scope  implements Scope {
 	
 	/** Checks if the variable of the given name is writable */
 	public boolean isExist(String pName)  {
-		return (Boolean)ScriptManager.Instance.getDefaultEngineOf(JSEngine.Name).eval(
-				String.format("(typeof(%s)!=\"undefined\")", pName), this, null);
+		return false;
 	}
 	
 	/** Checks if the variable of the given name is writable */

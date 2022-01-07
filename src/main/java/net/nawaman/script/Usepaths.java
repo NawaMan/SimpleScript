@@ -4,13 +4,14 @@ import java.io.File;
 import java.util.HashSet;
 import java.util.Vector;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import net.nawaman.usepath.FileExtFilter;
-import net.nawaman.usepath.UFFileExtFilter;
-import net.nawaman.usepath.UPFileInFolder;
+import net.nawaman.usepath.FileExtUsableFilter;
 import net.nawaman.usepath.UsableFilter;
+import net.nawaman.usepath.UsePathFileInFolder;
 
-public class Usepaths extends net.nawaman.usepath.Usepaths {
+public class Usepaths extends net.nawaman.usepath.AppendableUsepaths {
 
 	/** Filter only the ss[a-zA-Z] files */
 	static public final SSFileFilter SSFILEFILTER = new SSFileFilter();
@@ -36,9 +37,9 @@ public class Usepaths extends net.nawaman.usepath.Usepaths {
 	}
 
 	/** Filter for SSFile only */
-	static public class SSFileFilter extends UFFileExtFilter {
+	static public class SSFileFilter extends FileExtUsableFilter {
 		public SSFileFilter() {
-			super(new FileExtFilter.FEFRegExp(Pattern.compile("^ss[a-zA-Z_]*$")));
+			super(new FileExtFilter.RegExpFileFilter(Pattern.compile("^ss[a-zA-Z_]*$")));
 		}
 	}
 	
@@ -60,11 +61,11 @@ public class Usepaths extends net.nawaman.usepath.Usepaths {
 		File Folder = new File(UPath);
 		if(!Folder.exists() || !Folder.isDirectory() || !Folder.canRead()) return;
 		
-		UPFileInFolder UPFIF = null;
-		try { UPFIF = new UPFileInFolder(Folder); }
+		UsePathFileInFolder UPFIF = null;
+		try { UPFIF = new UsePathFileInFolder(Folder); }
 		catch (Exception e) { return; }
 		
-		this.Usepaths.put(UPFIF.getName(), UPFIF);
+		this.registerUsepath(UPFIF.name(), UPFIF);
 		
 		if(!ToDig) return;
 		
@@ -96,16 +97,9 @@ public class Usepaths extends net.nawaman.usepath.Usepaths {
 		}
 	}
 	
-	/**{@inheritDoc}*/ @Override
-	public int getUsableFilterCount() {
-		return this.UsableFilters.size();
+	/** @return  the usable filters that this UsePath uses. */
+	public Stream<UsableFilter> usableFilters() {
+		return UsableFilters.stream();
 	}
-	
-	/**{@inheritDoc}*/ @Override
-	public UsableFilter getUsableFilter(int I) {
-		if((I < 0) || (I >= this.UsableFilters.size())) return null;
-		return this.UsableFilters.get(I);
-	}
-	
 	
 }

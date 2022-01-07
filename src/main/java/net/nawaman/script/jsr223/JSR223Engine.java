@@ -22,7 +22,6 @@ import net.nawaman.script.Scope;
 import net.nawaman.script.Script;
 import net.nawaman.script.ScriptEngine;
 import net.nawaman.script.ScriptEngineOption;
-import net.nawaman.script.ScriptManager;
 import net.nawaman.script.Signature;
 import net.nawaman.script.SimpleScriptExecutionExceptionWrapper;
 import net.nawaman.script.Utils;
@@ -346,7 +345,7 @@ abstract public class JSR223Engine implements ScriptEngine {
 			ProblemContainer pResult) {
 		return Utils.compileExecutable(this, pExecInfo, pCode, pOption, pResult);
 	}
-
+	
 	/** Create a simple JSR223 script */
 	final protected Script newSimpleScript(String pCode) {
 		JSR223CompiledCode CCode = (JSR223CompiledCode)this.compile(pCode, null, null, null, null);
@@ -362,23 +361,4 @@ abstract public class JSR223Engine implements ScriptEngine {
 		return null;
 	}
 	
-	// Utilities -------------------------------------------------------------------------------------------------------
-
-	static public void main(String ... Args) {
-		String Code = "println(Prefix + \": \" + Text + \": \" + I);";
-		System.out.println("Code:-----------------------------------------------------------------------");
-		System.out.println(Code);
-		System.out.println("----------------------------------------------------------------------------");
-
-		JSEngine JSE = (JSEngine)ScriptManager.Instance.getDefaultEngineOf("JavaScript");
-
-		Scope MainS = JSE.newScope();
-		MainS.newVariable("Text", String.class, "Hello from CodeLab!");
-
-		Macro M = JSE.newMacro(new Signature.Simple("fact", Long.class, false, Long.class), new String[] { "I" }, Code, MainS,
-				new String[] { "Text" }, null, null);
-
-		MainS.newVariable("Prefix", String.class, "HERE");
-		for(int i = 0; i < 21; i++) M.run(MainS, (long)i);
-	}
 }

@@ -10,7 +10,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.nawaman.script.java.JavaEngine;
-import net.nawaman.script.jsr223.JSEngine;
 import net.nawaman.usepath.UsableHolder;
 
 /** Manager to manage script engines */
@@ -96,12 +95,7 @@ final public class ScriptManager {
 		// Get class name from alias
 		if(Instance.EngineNameAlias.containsKey(pName)) return Instance.EngineNameAlias.get(pName);
 		if(Instance.DefaultEngines.containsKey(pName))  return pName;
-
-		// Pre-load JavaScript
-		if(JSEngine.ShortName.equals(pName) || JSEngine.Name.equals(pName)) {
-			Instance.loadEngine(JSEngine.class);
-			return JSEngine.class.getCanonicalName();
-		}
+		
 		// Pre-load Java
 		if(JavaEngine.ShortName.equals(pName) || JavaEngine.Name.equals(pName)) {
 			Instance.loadEngine(JavaEngine.class);
@@ -113,9 +107,10 @@ final public class ScriptManager {
 			if((C == null) || !(ScriptEngine.class.isAssignableFrom(C))) return null;
 			
 			Instance.loadEngine(C.asSubclass(ScriptEngine.class));
-			return JSEngine.class.getCanonicalName();
+			return C.getCanonicalName();
 			
 		} catch (ClassNotFoundException CCE) {}
+		
 		
 		return pName;
 	}
@@ -357,7 +352,7 @@ final public class ScriptManager {
 	 * 
 	 * This allows the engine mark to be comment out.
 	 **/
-	static public String[] GetEngineNameAndParamFromCode(String pCode) {
+	static public String[] getEngineNameAndParamFromCode(String pCode) {
 		Matcher M = EngineNameExtractor.matcher(pCode);
 		
 		if(!M.find(GetEndOfIgnored(pCode))) return null;
@@ -393,7 +388,7 @@ final public class ScriptManager {
 	@SuppressWarnings("finally")
 	static public ScriptEngine GetEngineFromCode(String pCode) {
 		
-		String[] EngineNameAndParam = GetEngineNameAndParamFromCode(pCode);
+		String[] EngineNameAndParam = getEngineNameAndParamFromCode(pCode);
 		ScriptEngine SE     = null;
 		String       EName  = null;
 		String       EParam = null;
@@ -438,11 +433,10 @@ final public class ScriptManager {
 		return null;
 	}
 	
-	/** Searchs and Returns the executable. */
-	@SuppressWarnings("unchecked")
+	/** Searches and Returns the executable. */
 	static public Executable UseWithException(String Name) throws FileNotFoundException, IOException,
 								ClassNotFoundException {
-		UsableHolder<Executable> UH = (UsableHolder<Executable>)Usepaths.getUsableHolder(Name);
+		UsableHolder<Executable> UH = Usepaths.getUsableHolder(Name);
 		if(UH != null) return UH.get();
 		
 		return null;

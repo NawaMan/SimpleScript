@@ -22,7 +22,7 @@ import net.nawaman.script.*;
 import net.nawaman.script.java.JavaCompiledCode.JavaCode;
 import net.nawaman.script.java.JavaRoughParser.Statement;
 import net.nawaman.usepath.FileExtFilter;
-import net.nawaman.usepath.UFFileExtFilter;
+import net.nawaman.usepath.FileExtUsableFilter;
 import net.nawaman.usepath.UsableFilter;
 
 /**
@@ -151,15 +151,15 @@ public class JavaEngine implements ScriptEngine {
 
 	/**{@inheritDoc}*/ @Override
 	public ExecutableInfo getReplaceExecutableInfo(ExecutableInfo EInfo) {
-		return null;
+		return EInfo;
 	}
 	
 	// Usable Filters (File filter) ------------------------------------------------------------------------------------
 
 	/** Filter for JASFile only (jas = Java As Script) */
-	static class JASFileFilter extends UFFileExtFilter {
+	static class JASFileFilter extends FileExtUsableFilter {
 		public JASFileFilter() {
-			super(new FileExtFilter.FEFExtList("jas"));
+			super(new FileExtFilter.ExtListFileFilter("jas"));
 		}
 	}
 	

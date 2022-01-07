@@ -82,7 +82,7 @@ public class Main {
 				ShowUsage("Missing the command code.\n", -1);
 			
 			String   Command = Args.get(Index);
-			String[] EInfo   = ScriptManager.GetEngineNameAndParamFromCode(Command);
+			String[] EInfo   = ScriptManager.getEngineNameAndParamFromCode(Command);
 			if((EInfo != null) && (EInfo[0] != null)) {
 				ScriptEngine CEngine = ScriptManager.GetEngineFromCode(Command);	// Engine extracted from Command
 				if(CEngine == null)
